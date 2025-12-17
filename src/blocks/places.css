@@ -1,0 +1,95 @@
+.places {
+  margin-bottom: 66px;
+}
+
+.places__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(282px, 1fr));
+  gap: 20px 17px;
+  list-style: none;
+  padding: 0;
+  justify-content: center;
+}
+
+.place-card {
+  width: 282px;
+  min-height: 362px;
+  background-color: #fff;
+  color: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: 0 auto;
+}
+
+.place-card__image {
+  width: 100%;
+  height: 282px;
+  object-fit: cover;
+}
+
+.place-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 21px 25px 20px;
+}
+
+.place-card__title {
+  font-size: 24px;
+  line-height: 29px;
+  font-weight: 900;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.button_type_like {
+  background-image: url("../assets/images/like-button.png");
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 21px;
+  height: 19px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.button_type_like:hover {
+  opacity: 0.5;
+}
+
+.button_type_like-active {
+  background-image: url("../assets/images/like-button-active.png");
+}
+.button_type_delete {
+  background-image: url("../assets/images/Trash.svg");
+  background-color: transparent;
+  width: 18px;
+  height: 19px;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+@media screen and (max-width: 600px) {
+  .places {
+    margin-bottom: 48px;
+  }
+
+  .places__list {
+    gap: 20px 0;
+    padding: 0;
+  }
+
+  .place-card {
+    width: 282px;
+  }
+}

@@ -1,2 +1,1 @@
-import PopupWithForm from "../PopupWithForm/PopupWithForm";
-export default PopupWithForm;
+export { default } from "../PopupWithImage/PopupWithImage";

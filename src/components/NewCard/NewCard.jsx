@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
 
-export default function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
+export default function NewCard({ isOpen, onClose, onAddPlace }) {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
 

@@ -1,3 +1,11 @@
-//Estou criando este arquivo apenas para passar no validador automático, porquê o arquivo Main.jsx já possui os três Popups disponíveis no seu corpo
-const Popup = () => <></>;
-export default Popup;
+export default function Popup({ title, children, onClose }) {
+  return (
+    <div className="popup">
+      <div className="popup__content">
+        <button type="button" className="popup__close" onClick={onClose} />
+        {title && <h3 className="popup__title">{title}</h3>}
+        {children}
+      </div>
+    </div>
+  );
+}

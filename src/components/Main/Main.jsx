@@ -1,25 +1,38 @@
+import { useContext } from "react";
+
 import editButton from "../../assets/images/edit-button.png";
 import addButton from "../../assets/images/add-button.png";
 
 import Card from "../Card/Card";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 export default function Main({
   cards,
-  avatar,
   onCardClick,
   onCardLike,
   onCardDelete,
   onEditProfile,
   onEditAvatar,
   onAddPlace,
-  name,
-  about,
 }) {
+  const { currentUser } = useContext(CurrentUserContext);
+
+  if (!currentUser || !currentUser._id) {
+    return null;
+  }
+
   return (
     <main className="content">
       <section className="profile page__section">
         <div className="profile__avatar-container">
-          <img src={avatar} alt="Avatar" className="profile__image" />
+          {currentUser.avatar && (
+            <img
+              src={currentUser.avatar}
+              alt="Avatar"
+              className="profile__image"
+            />
+          )}
+
           <button
             type="button"
             className="button_type_edit-avatar"
@@ -30,7 +43,7 @@ export default function Main({
 
         <div className="profile__info">
           <div className="profile__info-wrapper">
-            <h1 className="profile__name">{name}</h1>
+            <h1 className="profile__name">{currentUser.name}</h1>
 
             <button
               type="button"
@@ -39,13 +52,13 @@ export default function Main({
             >
               <img
                 src={editButton}
-                alt="Edit button"
+                alt="Editar perfil"
                 className="button__icon"
               />
             </button>
           </div>
 
-          <p className="profile__description">{about}</p>
+          <p className="profile__description">{currentUser.about}</p>
         </div>
 
         <button
@@ -53,7 +66,7 @@ export default function Main({
           className="profile__add-button"
           onClick={onAddPlace}
         >
-          <img src={addButton} alt="Add button" className="button__icon" />
+          <img src={addButton} alt="Adicionar" className="button__icon" />
         </button>
       </section>
 
@@ -61,7 +74,7 @@ export default function Main({
         <ul className="places__list">
           {cards.map((card) => (
             <Card
-              key={card.name}
+              key={card._id}
               card={card}
               onCardClick={onCardClick}
               onCardLike={onCardLike}

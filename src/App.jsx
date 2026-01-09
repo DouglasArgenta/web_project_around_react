@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Header from "./components/Header/Header.jsx";
 import Main from "./components/Main/Main.jsx";
@@ -8,21 +8,26 @@ import EditProfilePopup from "./components/EditProfilePopup/EditProfilePopup.jsx
 import EditAvatarPopup from "./components/EditAvatarPopup/EditAvatarPopup.jsx";
 import AddPlacePopup from "./components/AddPlacePopup/AddPlacePopup.jsx";
 
-import { initialCards } from "./utils/constants";
+import api from "./utils/api";
+import CurrentUserContext from "./contexts/CurrentUserContext";
 
 function App() {
-  const [userName, setUserName] = useState("Jacques Cousteau");
-  const [userDescription, setUserDescription] = useState("Explorador");
-  const [avatar, setAvatar] = useState(
-    new URL("./assets/images/profile-image.jpg", import.meta.url).href
-  );
-
-  const [cards, setCards] = useState(initialCards);
+  const [currentUser, setCurrentUser] = useState({});
+  const [cards, setCards] = useState([]);
 
   const [selectedCard, setSelectedCard] = useState(null);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+
+  useEffect(() => {
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userData, cardsData]) => {
+        setCurrentUser(userData);
+        setCards(cardsData);
+      })
+      .catch(console.error);
+  }, []);
 
   function handleCardClick(card) {
     setSelectedCard(card);
@@ -40,84 +45,106 @@ function App() {
     setIsAddPlacePopupOpen(true);
   }
 
-  function handleUpdateUser({ name, about }) {
-    setUserName(name);
-    setUserDescription(about);
-    closeAllPopups();
-  }
-
-  function handleUpdateAvatar({ avatar }) {
-    setAvatar(avatar);
-    closeAllPopups();
-  }
-
-  function handleAddPlace(card) {
-    setCards([card, ...cards]);
-    closeAllPopups();
-  }
-
-  function handleCardLike(cardToLike) {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card === cardToLike ? { ...card, isLiked: !card.isLiked } : card
-      )
-    );
-  }
-
-  function handleCardDelete(cardToDelete) {
-    setCards((prevCards) => prevCards.filter((card) => card !== cardToDelete));
-  }
-
   function closeAllPopups() {
-    setSelectedCard(null);
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setSelectedCard(null);
+  }
+
+  function handleCardLike(card) {
+    const isLiked = card.isLiked;
+
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+
+      .then((newCard) => {
+        console.log(newCard);
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch(console.error);
+  }
+
+  function handleCardDelete(card) {
+    api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards((state) => state.filter((c) => c._id !== card._id));
+      })
+      .catch(console.error);
+  }
+
+  function handleUpdateUser({ name, about }) {
+    api
+      .setUserInfo({ name, about })
+      .then((newData) => {
+        setCurrentUser(newData);
+        closeAllPopups();
+      })
+      .catch(console.error);
+  }
+
+  function handleUpdateAvatar({ avatar }) {
+    api
+      .setUserAvatar({ avatar })
+      .then((newData) => {
+        setCurrentUser(newData);
+        closeAllPopups();
+      })
+      .catch(console.error);
+  }
+
+  function handleAddPlace({ name, link }) {
+    api
+      .addCard({ name, link })
+      .then((newCard) => {
+        setCards((state) => [newCard, ...state]);
+        closeAllPopups();
+      })
+      .catch(console.error);
   }
 
   return (
-    <div className="page">
-      <div className="page__content">
-        <Header />
+    <CurrentUserContext.Provider value={{ currentUser, handleUpdateUser }}>
+      <div className="page">
+        <div className="page__content">
+          <Header />
 
-        <Main
-          cards={cards}
-          avatar={avatar}
-          onCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
-          onEditProfile={handleEditProfileClick}
-          onEditAvatar={handleEditAvatarClick}
-          onAddPlace={handleAddPlaceClick}
-          name={userName}
-          about={userDescription}
-        />
+          <Main
+            cards={cards}
+            onCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
+            onEditProfile={handleEditProfileClick}
+            onEditAvatar={handleEditAvatarClick}
+            onAddPlace={handleAddPlaceClick}
+          />
 
-        <Footer />
+          <Footer />
 
-        <PopupWithImage card={selectedCard} onClose={closeAllPopups} />
+          <PopupWithImage card={selectedCard} onClose={closeAllPopups} />
 
-        <EditProfilePopup
-          isOpen={isEditProfilePopupOpen}
-          onClose={closeAllPopups}
-          onUpdateUser={handleUpdateUser}
-          currentName={userName}
-          currentAbout={userDescription}
-        />
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+          />
 
-        <EditAvatarPopup
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}
-          onUpdateAvatar={handleUpdateAvatar}
-        />
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
 
-        <AddPlacePopup
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}
-          onAddPlace={handleAddPlace}
-        />
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleAddPlace}
+          />
+        </div>
       </div>
-    </div>
+    </CurrentUserContext.Provider>
   );
 }
 

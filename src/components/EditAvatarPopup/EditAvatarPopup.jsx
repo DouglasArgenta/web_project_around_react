@@ -1,17 +1,21 @@
+import { useRef, useEffect } from "react";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
-import { useState } from "react";
 
 export default function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
-  const [avatar, setAvatar] = useState("");
+  const avatarRef = useRef();
 
-  function handleChange(e) {
-    setAvatar(e.target.value);
-  }
+  useEffect(() => {
+    if (!isOpen && avatarRef.current) {
+      avatarRef.current.value = "";
+    }
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
-    onUpdateAvatar({ avatar });
-    setAvatar("");
+
+    onUpdateAvatar({
+      avatar: avatarRef.current.value,
+    });
   }
 
   return (
@@ -28,11 +32,10 @@ export default function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
         name="avatar"
         placeholder="Link para a nova foto"
         required
-        value={avatar}
-        onChange={handleChange}
+        ref={avatarRef}
       />
 
-      <button type="submit" className="popup__button_type_save">
+      <button type="submit" className="button popup__button_type_save">
         Salvar
       </button>
     </PopupWithForm>

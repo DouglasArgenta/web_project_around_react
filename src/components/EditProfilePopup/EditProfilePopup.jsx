@@ -1,27 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-export default function EditProfilePopup({
-  isOpen,
-  onClose,
-  onUpdateUser,
-  currentName,
-  currentAbout,
-}) {
+export default function EditProfilePopup({ isOpen, onClose }) {
+  const { currentUser, handleUpdateUser } = useContext(CurrentUserContext);
+
   const [name, setName] = useState("");
-  const [about, setAbout] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
-    setName(currentName);
-    setAbout(currentAbout);
-  }, [currentName, currentAbout, isOpen]);
+    if (currentUser) {
+      setName(currentUser.name || "");
+      setDescription(currentUser.about || "");
+    }
+  }, [currentUser, isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    onUpdateUser({
+    handleUpdateUser({
       name,
-      about,
+      about: description,
     });
   }
 
@@ -53,8 +52,8 @@ export default function EditProfilePopup({
         minLength="2"
         maxLength="200"
         required
-        value={about}
-        onChange={(e) => setAbout(e.target.value)}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
       />
 
       <button type="submit" className="popup__button_type_save">

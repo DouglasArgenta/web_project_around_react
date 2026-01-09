@@ -1,21 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
 
 export default function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
 
+  useEffect(() => {
+    if (!isOpen) {
+      setName("");
+      setLink("");
+    }
+  }, [isOpen]);
+
+  function handleNameChange(e) {
+    setName(e.target.value);
+  }
+
+  function handleLinkChange(e) {
+    setLink(e.target.value);
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
     onAddPlace({
-      name,
-      link,
-      isLiked: false,
+      name: name,
+      link: link,
     });
-
-    setName("");
-    setLink("");
   }
 
   return (
@@ -29,25 +40,27 @@ export default function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       <input
         type="text"
         className="popup__input"
+        name="title"
         placeholder="Título"
         minLength="1"
         maxLength="30"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
         required
+        value={name}
+        onChange={handleNameChange}
       />
 
       <input
         type="url"
         className="popup__input"
+        name="link"
         placeholder="Link da imagem"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
         required
+        value={link}
+        onChange={handleLinkChange}
       />
 
-      <button type="submit" className="popup__button_type_save">
-        Salvar
+      <button type="submit" className="button popup__button_type_save">
+        Criar
       </button>
     </PopupWithForm>
   );

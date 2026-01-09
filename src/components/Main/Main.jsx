@@ -4,6 +4,9 @@ import editButton from "../../assets/images/edit-button.png";
 import addButton from "../../assets/images/add-button.png";
 
 import Card from "../Card/Card";
+import Popup from "../Popup/Popup";
+import NewCard from "../NewCard/NewCard";
+
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 
 export default function Main({
@@ -83,6 +86,10 @@ export default function Main({
           ))}
         </ul>
       </section>
+
+      <Popup title="New Card">
+        <NewCard />
+      </Popup>
     </main>
   );
 }
